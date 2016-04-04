@@ -11,6 +11,10 @@ upstream {{ project_name }}  {
         return 444;
     }
 
+    location /.well-known {
+        alias {{ public_root }}/.well-known;
+    }
+
     location /robots.txt {
         alias {{ static_dir }}/robots.txt;
     }

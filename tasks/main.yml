@@ -83,14 +83,49 @@
 
 # TODO: http_auth file(s)
 
-# TODO: nginx conf
 - name: configure nginx "server" for our project
   template: >
     dest=/etc/nginx/sites-enabled/{{ project_name }}.conf
     owner=root
     mode=644
     src=nginx.conf.j2
-  notify: restart nginx
+  notify: reload nginx
+
+- name: install letsencrypt
+  pip: name=letsencrypt state=latest
+  when: use_letsencrypt
+
+- name: obtain initial letsencrypt cert
+  command: letsencrypt-auto certonly --webroot --webroot-path {{ public_dir }} -d {{ domain }} --email={{ admin_email }} --agree-tos
+  args:
+    creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+  when: use_letsencrypt
+
+- name: link letsencrypt certificate
+  file: src=/etc/letsencrypt/live/{{ domain }}/fullchain.pem
+        dest={{ ssl_dir }}/{{ domain }}.crt
+        state=link
+        force=yes
+  when: use_letsencrypt
+  notify: reload nginx
+
+- name: link letsencrypt key
+  file: src=/etc/letsencrypt/live/{{ domain }}/privkey.pem
+        dest={{ ssl_dir }}/{{ domain }}.key
+        state=link
+        force=yes
+  when: use_letsencrypt
+  notify: reload nginx
+
+- name: add letsencrypt renewal cron job
+  cron: name="renew_letsencrypt"
+        job="letsencrypt-auto renew; /etc/init.d/nginx reload"
+        cron_file=letsencrypt
+        user=root
+        hour=random
+        minute=random
+        dayweek=0
+  when: use_letsencrypt
 
 - name: install memcached
   apt: name=memcached state=present
