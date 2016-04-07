@@ -1,0 +1,7 @@
+---
+root_dir: "/var/www/{{ project_name }}"
+public_dir: "{{ root_dir }}/public"
+static_dir: "{{ root_dir }}/public/static"
+media_dir: "{{ root_dir }}/public/media"
+ssl_dir: "{{ root_dir }}/ssl"
+dhparams_file: "{{ ssl_dir }}/dhparams.pem"
