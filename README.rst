@@ -80,6 +80,7 @@ role:
 - ``use_letsencrypt``
 - ``admin_email`` **required if use_letsencrypt**
 - ``app_minions`` **required:** combined list of web servers and celery worker servers
+- ``use_memcached`` **default:** true
 
 The ``app_minions`` variable can be constructed from Ansible's
 inventory information, like ::
