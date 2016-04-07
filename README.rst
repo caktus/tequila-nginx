@@ -71,16 +71,15 @@ role:
 - ``static_dir`` **default:** ``"{{ root_dir }}/public/static"``
 - ``media_dir`` **default:** ``"{{ root_dir }}/public/media"``
 - ``ssl_dir`` **default:** ``"{{ root_dir }}/ssl"``
-- ``force_ssl`` **default:** ``False``
+- ``force_ssl`` **default:** ``false``
 - ``http_auth`` **optional**
 - ``auth_file`` **required if http_auth**
 - ``dhparams_file`` **default:** ``"{{ ssl_dir }}/dhparams.pem"``
 - ``dhparams_numbits`` **default:** ``2048``
-- ``self_signed``
-- ``use_letsencrypt``
-- ``admin_email`` **required if use_letsencrypt**
+- ``cert_source`` **required, values:** ``'letsencrypt'``, ``'selfsign'``, ``'provided'``
+- ``admin_email`` **required if cert_source = letsencrypt**
+- ``use_memcached`` **default:** ``true``
 - ``app_minions`` **required:** combined list of web servers and celery worker servers
-- ``use_memcached`` **default:** true
 
 The ``app_minions`` variable can be constructed from Ansible's
 inventory information, like ::
