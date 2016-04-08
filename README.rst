@@ -71,7 +71,7 @@ role:
 - ``static_dir`` **default:** ``"{{ root_dir }}/public/static"``
 - ``media_dir`` **default:** ``"{{ root_dir }}/public/media"``
 - ``ssl_dir`` **default:** ``"{{ root_dir }}/ssl"``
-- ``force_ssl`` **default:** ``false``
+- ``force_ssl`` **default:** ``true``
 - ``http_auth`` **optional**
 - ``auth_file`` **required if http_auth**
 - ``dhparams_file`` **default:** ``"{{ ssl_dir }}/dhparams.pem"``
