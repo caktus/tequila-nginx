@@ -36,7 +36,7 @@ Ansible where to install your roles (optionally, set the
 allow the roles to be installed into ``/etc/ansible/roles``) ::
 
     [defaults]
-    roles_path = roles/
+    roles_path = deployment/roles/
 
 Create a ``requirements.yml`` file in your project's deployment
 directory ::
