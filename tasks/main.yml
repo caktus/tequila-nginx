@@ -61,7 +61,7 @@
   args:
     chdir: "{{ ssl_dir }}"
     creates: "{{ domain }}.crt"
-  when: self_signed
+  when: cert_source == "selfsign"
   with_items:
     - openssl genrsa -out {{ domain }}.key 2048
     - cp {{ domain }}.key {{ domain }}.key.secure
@@ -74,7 +74,7 @@
         dest={{ ssl_dir }}
         owner=root
         mode=600
-  when: not self_signed
+  when: cert_source == "provided"
   with_items:
     - "{{ domain }}.crt"
     - "{{ domain }}.key"
@@ -83,11 +83,59 @@
 
 # TODO: http_auth file(s)
 
-# TODO: nginx conf
 - name: configure nginx "server" for our project
   template: >
     dest=/etc/nginx/sites-enabled/{{ project_name }}.conf
     owner=root
     mode=644
     src=nginx.conf.j2
-  notify: restart nginx
+  notify: reload nginx
+
+- name: install letsencrypt
+  pip: name=letsencrypt state=latest
+  when: cert_source == "letsencrypt"
+
+- name: obtain initial letsencrypt cert
+  command: letsencrypt-auto certonly --webroot --webroot-path {{ public_dir }} -d {{ domain }} --email={{ admin_email }} --agree-tos
+  args:
+    creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+  when: cert_source == "letsencrypt"
+
+- name: link letsencrypt certificate
+  file: src=/etc/letsencrypt/live/{{ domain }}/fullchain.pem
+        dest={{ ssl_dir }}/{{ domain }}.crt
+        state=link
+        force=yes
+  when: cert_source == "letsencrypt"
+  notify: reload nginx
+
+- name: link letsencrypt key
+  file: src=/etc/letsencrypt/live/{{ domain }}/privkey.pem
+        dest={{ ssl_dir }}/{{ domain }}.key
+        state=link
+        force=yes
+  when: cert_source == "letsencrypt"
+  notify: reload nginx
+
+- name: add letsencrypt renewal cron job
+  cron: name="renew_letsencrypt"
+        job="letsencrypt-auto renew; /etc/init.d/nginx reload"
+        cron_file=letsencrypt
+        user=root
+        hour=random
+        minute=random
+        dayweek=0
+  when: cert_source == "letsencrypt"
+
+- name: install memcached
+  apt: name=memcached state=present
+  when: use_memcached
+
+- name: ensure memcached is running
+  service: name=memcached state=started
+  when: use_memcached
+
+- name: allow the app minions through the firewall for memcached
+  ufw: rule=allow port=11211 from_ip={{ hostvars[item].ansible_eth0.ipv4.address }}
+  with_items: "{{ app_minions }}"
+  when: use_memcached
