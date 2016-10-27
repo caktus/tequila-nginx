@@ -11,7 +11,7 @@ template <https://github.com/caktus/django-project-template>`_.
 License
 -------
 
-These playbooks are released under the BSD License.  See the `LICENSE
+This Ansible role is released under the BSD License.  See the `LICENSE
 <https://github.com/caktus/tequila-nginx/blob/master/LICENSE>`_ file
 for more details.
 
