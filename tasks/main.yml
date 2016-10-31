@@ -55,6 +55,7 @@
   command: openssl dhparam -out {{ dhparams_file }} {{ dhparam_numbits|default(2048) }}
   args:
     creates: "{{ dhparams_file }}"
+  when: env_name != 'local'
 
 - name: optionally generate self-signed cert
   command: "{{ item }}"
