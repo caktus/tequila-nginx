@@ -78,12 +78,12 @@
     src=nginx.conf.j2
   notify: reload nginx
 
-- name: install letsencrypt
-  pip: name=letsencrypt state=latest
+- name: install the letsencrypt certbot
+  pip: name=certbot state=latest
   when: cert_source == "letsencrypt"
 
 - name: obtain initial letsencrypt cert
-  command: letsencrypt-auto certonly --webroot --webroot-path {{ public_dir }} -d {{ domain }} --email={{ admin_email }} --agree-tos --text --non-interactive
+  command: certbot-auto certonly --webroot -w {{ public_dir }} -d {{ domain }} --email={{ admin_email }} --agree-tos --text --non-interactive
   args:
     creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
   when: cert_source == "letsencrypt"
@@ -106,7 +106,7 @@
 
 - name: add letsencrypt renewal cron job
   cron: name="renew_letsencrypt"
-        job="letsencrypt-auto renew; /etc/init.d/nginx reload"
+        job="certbot-auto renew; /etc/init.d/nginx reload"
         cron_file=letsencrypt
         user=root
         hour=random
