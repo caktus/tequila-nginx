@@ -83,9 +83,11 @@
   when: cert_source == "letsencrypt"
 
 - name: obtain initial letsencrypt cert
-  command: certbot-auto certonly --webroot -w {{ public_dir }} -d {{ domain }} --email={{ admin_email }} --agree-tos --text --non-interactive
+  command: certbot-auto certonly --webroot -w {{ public_dir }} {{ letsencrypt_domain_args }} --email={{ admin_email }} --agree-tos --text --non-interactive
   args:
     creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+  vars:
+    letsencrypt_domain_args: "{% for d in letsencrypt_domains|default([domain, 'www.'+domain]) %} -d {{ d }}{% endfor %}"
   when: cert_source == "letsencrypt"
 
 - name: link letsencrypt certificate
