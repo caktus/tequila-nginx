@@ -83,7 +83,7 @@
   when: cert_source == "letsencrypt"
 
 - name: obtain initial letsencrypt cert
-  command: letsencrypt-auto certonly --webroot --webroot-path {{ public_dir }} -d {{ domain }} --email={{ admin_email }} --agree-tos
+  command: letsencrypt-auto certonly --webroot --webroot-path {{ public_dir }} -d {{ domain }} --email={{ admin_email }} --agree-tos --text --non-interactive
   args:
     creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
   when: cert_source == "letsencrypt"
