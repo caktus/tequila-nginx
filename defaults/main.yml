@@ -6,4 +6,6 @@ media_dir: "{{ root_dir }}/public/media"
 ssl_dir: "{{ root_dir }}/ssl"
 force_ssl: true
 dhparams_file: "{{ ssl_dir }}/dhparams.pem"
+http_auth: []
+auth_file: "{{ root_dir }}/.htpasswd"
 use_memcached: true

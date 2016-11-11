@@ -68,9 +68,14 @@
   notify:
     - reload nginx
 
-# TODO: http_auth file(s)
+- include: http_auth.yml
+  when: http_auth
 
-- name: configure nginx "server" for our project
+- name: remove htpasswd file
+  file: path={{ auth_file }} state=absent
+  when: not http_auth
+
+- name: configure nginx server for our project
   template: >
     dest=/etc/nginx/sites-enabled/{{ project_name }}.conf
     owner=root

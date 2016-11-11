@@ -1,0 +1,12 @@
+---
+- name: install apache2-utils and passlib
+  apt: name={{ item }}
+       state=present
+  with_items:
+    - apache2-utils
+    - python-passlib
+
+- name: add logins and passwords to htpasswd file
+  htpasswd: path={{ auth_file }} name={{ item.login }} password={{ item.password }} crypt_scheme=des_crypt
+            state=present owner=root group=www-data mode=640
+  with_items: "{{ http_auth }}"

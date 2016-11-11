@@ -1,5 +1,5 @@
 upstream {{ project_name }}  {
-  server localhost:8000;
+    server localhost:8000;
 }
 
 {% macro serve_django() -%}
@@ -38,7 +38,14 @@ upstream {{ project_name }}  {
 
     location / {
         gzip off;
-        {% if http_auth is defined %}
+        {% if http_auth %}
+        {# Why do we do this? To allow CORS preflight requests in, of course. #}
+        if ($request_method != OPTIONS ) {
+            set $auth_basic "Restricted";
+        }
+        if ($request_method = OPTIONS) {
+            set $auth_basic off;
+        }
         auth_basic "Restricted";
         auth_basic_user_file {{ auth_file }};
         {% endif %}
@@ -60,10 +67,10 @@ server {
     access_log syslog:server=unix:/dev/log;
     error_log syslog:server=unix:/dev/log;
     {% if force_ssl %}
-        {# redirect all port 80 requests to SSL #}
-        return 301 https://{{ domain }}$request_uri;
+    {# redirect all port 80 requests to SSL #}
+    return 301 https://{{ domain }}$request_uri;
     {% else %}
-        {{ serve_django() }}
+    {{ serve_django() }}
     {% endif %}
 }
 
@@ -88,7 +95,7 @@ server {
     ssl_prefer_server_ciphers   on;
 
     {% if force_ssl %}
-        add_header Strict-Transport-Security max-age=31536000;
+    add_header Strict-Transport-Security max-age=31536000;
     {% endif %}
 
     {{ serve_django() }}
