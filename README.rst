@@ -70,6 +70,7 @@ role:
 - ``public_dir`` **default:** ``"{{ root_dir }}/public"``
 - ``static_dir`` **default:** ``"{{ root_dir }}/public/static"``
 - ``media_dir`` **default:** ``"{{ root_dir }}/public/media"``
+- ``nginx_conf_template`` **default:** ``"nginx.conf.j2"``
 - ``ssl_dir`` **default:** ``"{{ root_dir }}/ssl"``
 - ``force_ssl`` **default:** ``true``
 - ``http_auth`` **default:** empty list
@@ -98,3 +99,7 @@ actual project might look like ::
         password: password1
       - login: user2
         password: password2
+
+The ``nginx_conf_template`` variable is to allow the template that
+ships with this role to be overridden, if more complex directives need
+to be supported.
