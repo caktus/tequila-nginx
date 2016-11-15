@@ -3,7 +3,7 @@ upstream {{ project_name }}  {
 }
 
 {% macro serve_django() -%}
-    root {{ static_dir }};
+    root {{ public_dir }};
     keepalive_timeout 5;
 
     if ($host !~* ^({{ domain }}|www.{{ domain }})$) {
