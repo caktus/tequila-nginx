@@ -79,6 +79,8 @@ role:
 - ``dhparams_numbits`` **default:** ``2048``
 - ``cert_source`` **required, values:** ``'letsencrypt'``, ``'selfsign'``, ``'provided'``
 - ``admin_email`` **required if cert_source = letsencrypt**
+- ``ssl_cert`` **required if cert_source = provided**
+- ``ssl_key`` **required if cert_source = provided**
 - ``letsencrypt_domains`` **default:** ``[domain, 'www.'+domain]``
 - ``use_memcached`` **default:** ``true``
 - ``app_minions`` **required:** combined list of web servers and celery worker servers

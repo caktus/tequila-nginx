@@ -57,14 +57,14 @@
     - openssl x509 -req -days 365 -in {{ domain }}.csr -signkey {{ domain }}.key -out {{ domain }}.crt
 
 - name: optionally upload pre-generated cert
-  copy: src={{ item }}
-        dest={{ ssl_dir }}
+  copy: content={{ item.content }}
+        dest={{ ssl_dir }}/{{ item.dest }}
         owner=root
         mode=600
   when: cert_source == "provided"
   with_items:
-    - "{{ domain }}.crt"
-    - "{{ domain }}.key"
+    - {'content': "{{ ssl_cert }}", 'dest': "{{ domain }}.crt"}
+    - {'content': "{{ ssl_key }}", 'dest': "{{ domain }}.key"}
   notify:
     - reload nginx
 
