@@ -88,7 +88,7 @@
   when: cert_source == "letsencrypt"
 
 - name: obtain initial letsencrypt cert
-  command: certbot-auto certonly --webroot -w {{ public_dir }} {{ letsencrypt_domain_args }} --email={{ admin_email }} --agree-tos --text --non-interactive
+  command: certbot certonly --webroot -w {{ public_dir }} {{ letsencrypt_domain_args }} --email={{ admin_email }} --agree-tos --text --non-interactive
   args:
     creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
   vars:
@@ -113,12 +113,12 @@
 
 - name: add letsencrypt renewal cron job
   cron: name="renew_letsencrypt"
-        job="certbot-auto renew; /etc/init.d/nginx reload"
+        job="certbot renew; /etc/init.d/nginx reload"
         cron_file=letsencrypt
         user=root
-        hour=random
-        minute=random
-        dayweek=0
+        day={{ 28|random }}
+        hour={{ 24|random }}
+        minute={{ 60|random }}
   when: cert_source == "letsencrypt"
 
 - name: install memcached
