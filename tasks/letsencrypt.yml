@@ -1,0 +1,33 @@
+---
+- name: install the letsencrypt certbot
+  pip: name=certbot state=latest
+
+- name: obtain initial letsencrypt cert
+  command: certbot certonly --webroot -w {{ public_dir }} {{ letsencrypt_domain_args }} --email={{ admin_email }} --agree-tos --text --non-interactive
+  args:
+    creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+  vars:
+    letsencrypt_domain_args: "{% for d in letsencrypt_domains|default([domain, 'www.'+domain]) %} -d {{ d }}{% endfor %}"
+
+- name: link letsencrypt certificate
+  file: src=/etc/letsencrypt/live/{{ domain }}/fullchain.pem
+        dest={{ ssl_dir }}/{{ domain }}.crt
+        state=link
+        force=yes
+  notify: reload nginx
+
+- name: link letsencrypt key
+  file: src=/etc/letsencrypt/live/{{ domain }}/privkey.pem
+        dest={{ ssl_dir }}/{{ domain }}.key
+        state=link
+        force=yes
+  notify: reload nginx
+
+- name: add letsencrypt renewal cron job
+  cron: name="renew_letsencrypt"
+        job="certbot renew; /etc/init.d/nginx reload"
+        cron_file=letsencrypt
+        user=root
+        day={{ 28|random }}
+        hour={{ 24|random }}
+        minute={{ 60|random }}
