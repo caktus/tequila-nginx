@@ -34,7 +34,7 @@
 - name: link letsencrypt certificate
   file:
     src: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
-    dest: {{ ssl_dir }}/{{ domain }}.crt
+    dest: "{{ ssl_dir }}/{{ domain }}.crt"
     state: link
     force: yes
   notify: reload nginx
@@ -42,7 +42,7 @@
 - name: link letsencrypt key
   file:
     src: /etc/letsencrypt/live/{{ domain }}/privkey.pem
-    dest: {{ ssl_dir }}/{{ domain }}.key
+    dest: "{{ ssl_dir }}/{{ domain }}.key"
     state: link
     force: yes
   notify: reload nginx
