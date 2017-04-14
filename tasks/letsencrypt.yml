@@ -19,7 +19,7 @@
     mode: 755
 
 - name: receive the certbot gpg key
-  command: gpg2 --recv-key A2CFB51FA275A7286234E7B24D17C995CD9775F2
+  command: gpg2 --keyserver pgpkeys.mit.edu --recv-key A2CFB51FA275A7286234E7B24D17C995CD9775F2
 
 - name: verify the certbot-auto download
   command: gpg2 --trusted-key 4D17C995CD9775F2 --verify /tmp/certbot-auto.asc /usr/local/bin/certbot-auto
