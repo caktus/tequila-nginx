@@ -24,20 +24,6 @@
   notify:
     - reload nginx
 
-- name: edit nginx.conf for access log
-  lineinfile: dest=/etc/nginx/nginx.conf
-              regexp="access_log /var/log/nginx/access.log;"
-              line="access_log syslog:server=unix:/dev/log;"
-  notify:
-    - reload nginx
-
-- name: edit nginx.conf for error log
-  lineinfile: dest=/etc/nginx/nginx.conf
-              regexp="error_log /var/log/nginx/error.log;"
-              line="error_log syslog:server=unix:/dev/log;"
-  notify:
-    - reload nginx
-
 - name: allow port 80 through firewall
   ufw: rule=allow port=http
 
@@ -55,6 +41,7 @@
   command: openssl dhparam -out {{ dhparams_file }} {{ dhparam_numbits|default(2048) }}
   args:
     creates: "{{ dhparams_file }}"
+  when: env_name != 'local'
 
 - name: optionally generate self-signed cert
   command: "{{ item }}"
@@ -70,35 +57,42 @@
     - openssl x509 -req -days 365 -in {{ domain }}.csr -signkey {{ domain }}.key -out {{ domain }}.crt
 
 - name: optionally upload pre-generated cert
-  copy: src={{ item }}
-        dest={{ ssl_dir }}
+  copy: content={{ item.content }}
+        dest={{ ssl_dir }}/{{ item.dest }}
         owner=root
         mode=600
   when: cert_source == "provided"
   with_items:
-    - "{{ domain }}.crt"
-    - "{{ domain }}.key"
+    - {'content': "{{ ssl_cert }}", 'dest': "{{ domain }}.crt"}
+    - {'content': "{{ ssl_key }}", 'dest': "{{ domain }}.key"}
   notify:
     - reload nginx
 
-# TODO: http_auth file(s)
+- include: http_auth.yml
+  when: http_auth
 
-- name: configure nginx "server" for our project
+- name: remove htpasswd file
+  file: path={{ auth_file }} state=absent
+  when: not http_auth
+
+- name: configure nginx server for our project
   template: >
     dest=/etc/nginx/sites-enabled/{{ project_name }}.conf
     owner=root
     mode=644
-    src=nginx.conf.j2
+    src={{ nginx_conf_template|default('nginx.conf.j2') }}
   notify: reload nginx
 
-- name: install letsencrypt
-  pip: name=letsencrypt state=latest
+- name: install the letsencrypt certbot
+  pip: name=certbot state=latest
   when: cert_source == "letsencrypt"
 
 - name: obtain initial letsencrypt cert
-  command: letsencrypt-auto certonly --webroot --webroot-path {{ public_dir }} -d {{ domain }} --email={{ admin_email }} --agree-tos
+  command: certbot certonly --webroot -w {{ public_dir }} {{ letsencrypt_domain_args }} --email={{ admin_email }} --agree-tos --text --non-interactive
   args:
     creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+  vars:
+    letsencrypt_domain_args: "{% for d in letsencrypt_domains|default([domain, 'www.'+domain]) %} -d {{ d }}{% endfor %}"
   when: cert_source == "letsencrypt"
 
 - name: link letsencrypt certificate
@@ -119,12 +113,12 @@
 
 - name: add letsencrypt renewal cron job
   cron: name="renew_letsencrypt"
-        job="letsencrypt-auto renew; /etc/init.d/nginx reload"
+        job="certbot renew; /etc/init.d/nginx reload"
         cron_file=letsencrypt
         user=root
-        hour=random
-        minute=random
-        dayweek=0
+        day={{ 28|random }}
+        hour={{ 24|random }}
+        minute={{ 60|random }}
   when: cert_source == "letsencrypt"
 
 - name: install memcached
@@ -136,6 +130,6 @@
   when: use_memcached
 
 - name: allow the app minions through the firewall for memcached
-  ufw: rule=allow port=11211 from_ip={{ hostvars[item].ansible_eth0.ipv4.address }}
+  ufw: rule=allow port=11211 from_ip={{ hostvars[item].ansible_default_ipv4.address }}
   with_items: "{{ app_minions }}"
   when: use_memcached

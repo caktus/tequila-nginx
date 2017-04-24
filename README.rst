@@ -11,7 +11,7 @@ template <https://github.com/caktus/django-project-template>`_.
 License
 -------
 
-These playbooks are released under the BSD License.  See the `LICENSE
+This Ansible role is released under the BSD License.  See the `LICENSE
 <https://github.com/caktus/tequila-nginx/blob/master/LICENSE>`_ file
 for more details.
 
@@ -70,14 +70,18 @@ role:
 - ``public_dir`` **default:** ``"{{ root_dir }}/public"``
 - ``static_dir`` **default:** ``"{{ root_dir }}/public/static"``
 - ``media_dir`` **default:** ``"{{ root_dir }}/public/media"``
+- ``nginx_conf_template`` **default:** ``"nginx.conf.j2"``
 - ``ssl_dir`` **default:** ``"{{ root_dir }}/ssl"``
 - ``force_ssl`` **default:** ``true``
-- ``http_auth`` **optional**
-- ``auth_file`` **required if http_auth**
+- ``http_auth`` **default:** empty list
+- ``auth_file`` **default:** ``"{{ root_dir }}/.htpasswd"``
 - ``dhparams_file`` **default:** ``"{{ ssl_dir }}/dhparams.pem"``
 - ``dhparams_numbits`` **default:** ``2048``
 - ``cert_source`` **required, values:** ``'letsencrypt'``, ``'selfsign'``, ``'provided'``
 - ``admin_email`` **required if cert_source = letsencrypt**
+- ``ssl_cert`` **required if cert_source = provided**
+- ``ssl_key`` **required if cert_source = provided**
+- ``letsencrypt_domains`` **default:** ``[domain, 'www.'+domain]``
 - ``use_memcached`` **default:** ``true``
 - ``app_minions`` **required:** combined list of web servers and celery worker servers
 
@@ -87,3 +91,17 @@ inventory information, like ::
     app_minions: "{{ groups['web'] | union(groups['worker']) }}"
 
 in one of your project's variable files.
+
+The ``http_auth`` variable is meant to be a list of dicts, where each
+dict contains a login and password.  So, a typical definition in an
+actual project might look like ::
+
+    http_auth:
+      - login: user1
+        password: password1
+      - login: user2
+        password: password2
+
+The ``nginx_conf_template`` variable is to allow the template that
+ships with this role to be overridden, if more complex directives need
+to be supported.

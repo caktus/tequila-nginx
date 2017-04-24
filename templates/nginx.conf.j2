@@ -1,9 +1,9 @@
 upstream {{ project_name }}  {
-  server localhost:8000;
+    server localhost:8000;
 }
 
 {% macro serve_django() -%}
-    root {{ static_dir }};
+    root {{ public_dir }};
     keepalive_timeout 5;
 
     if ($host !~* ^({{ domain }}|www.{{ domain }})$) {
@@ -38,7 +38,14 @@ upstream {{ project_name }}  {
 
     location / {
         gzip off;
-        {% if http_auth is defined %}
+        {% if http_auth %}
+        {# Why do we do this? To allow CORS preflight requests in, of course. #}
+        if ($request_method != OPTIONS ) {
+            set $auth_basic "Restricted";
+        }
+        if ($request_method = OPTIONS) {
+            set $auth_basic off;
+        }
         auth_basic "Restricted";
         auth_basic_user_file {{ auth_file }};
         {% endif %}
@@ -60,10 +67,10 @@ server {
     access_log syslog:server=unix:/dev/log;
     error_log syslog:server=unix:/dev/log;
     {% if force_ssl %}
-        {# redirect all port 80 requests to SSL #}
-        return 301 https://{{ domain }}$request_uri;
+    {# redirect all port 80 requests to SSL #}
+    return 301 https://{{ domain }}$request_uri;
     {% else %}
-        {{ serve_django() }}
+    {{ serve_django() }}
     {% endif %}
 }
 
@@ -80,13 +87,15 @@ server {
     ssl_session_timeout  10m;
     ssl_certificate {{ ssl_dir }}/{{ domain }}.crt;
     ssl_certificate_key {{ ssl_dir }}/{{ domain }}.key;
+    {% if env_name != 'local' %}
     ssl_dhparam {{ dhparams_file }};
+    {% endif %}
     # cipher list from: https://weakdh.org/sysadmin.html
     ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA';
     ssl_prefer_server_ciphers   on;
 
     {% if force_ssl %}
-        add_header Strict-Transport-Security max-age=31536000;
+    add_header Strict-Transport-Security max-age=31536000;
     {% endif %}
 
     {{ serve_django() }}
