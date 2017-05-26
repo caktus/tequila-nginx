@@ -55,6 +55,8 @@
     - openssl rsa -in {{ domain }}.key.secure -out {{ domain }}.key
     - openssl req -new -key {{ domain }}.key -subj "/C=US/ST=North Carolina/L=Durham/O=Caktus/OU=IT/CN={{ domain }}" -out {{ domain }}.csr
     - openssl x509 -req -days 365 -in {{ domain }}.csr -signkey {{ domain }}.key -out {{ domain }}.crt
+  notify:
+    - reload nginx
 
 - name: optionally upload pre-generated cert
   copy: content={{ item.content }}
