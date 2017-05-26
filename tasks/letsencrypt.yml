@@ -1,0 +1,77 @@
+---
+- name: install gnupg2
+  apt:
+    name: gnupg2
+    state: present
+    cache_valid_time: 3600
+
+- name: download the certbot-auto signature file
+  get_url:
+    url: https://dl.eff.org/certbot-auto.asc
+    dest: /tmp/certbot-auto.asc
+    force: yes
+
+- name: install the certbot-auto script
+  get_url:
+    url: https://dl.eff.org/certbot-auto
+    dest: /usr/local/bin/certbot-auto
+    force: yes
+    mode: 755
+
+- name: receive the certbot gpg key
+  command: gpg2 --keyserver pgpkeys.mit.edu --recv-key A2CFB51FA275A7286234E7B24D17C995CD9775F2
+
+- name: verify the certbot-auto download
+  command: gpg2 --trusted-key 4D17C995CD9775F2 --verify /tmp/certbot-auto.asc /usr/local/bin/certbot-auto
+  register: verify_result
+  ignore_errors: true
+
+- name: delete certbot-auto if it fails to verify
+  file:
+    path: /usr/local/bin/certbot-auto
+    state: absent
+  when: verify_result|failed
+
+- name: re-raise certbot-auto verification failure
+  fail:
+    msg: "certbot-auto does not match the gpg key."
+  when: verify_result|failed
+
+- name: run certbot to get a key and certificate
+  command: certbot-auto certonly --webroot -w {{ public_dir }} {{ letsencrypt_domain_args }} --email={{ admin_email }} --agree-tos --text --quiet --no-self-upgrade
+  args:
+    creates: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+  vars:
+    letsencrypt_domain_args: "{% for d in letsencrypt_domains|default([domain, 'www.'+domain]) %} -d {{ d }}{% endfor %}"
+
+- name: link letsencrypt certificate
+  file:
+    src: /etc/letsencrypt/live/{{ domain }}/fullchain.pem
+    dest: "{{ ssl_dir }}/{{ domain }}.crt"
+    state: link
+    force: yes
+  notify: reload nginx
+
+- name: link letsencrypt key
+  file:
+    src: /etc/letsencrypt/live/{{ domain }}/privkey.pem
+    dest: "{{ ssl_dir }}/{{ domain }}.key"
+    state: link
+    force: yes
+  notify: reload nginx
+
+- name: add letsencrypt renewal cron job
+  cron:
+    name: renew_certbot
+    job: certbot-auto renew --quiet --no-self-upgrade --post-hook "service nginx reload"
+    cron_file: letsencrypt
+    user: root
+    day: "{{ 28|random }}"
+    hour: "{{ 24|random }}"
+    minute: "{{ 60|random }}"
+
+- name: remove old letsencrypt cron job
+  cron:
+    name: renew_letsencrypt
+    cron_file: letsencrypt
+    state: absent
