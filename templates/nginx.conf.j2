@@ -80,6 +80,7 @@ server {
     {% endif %}
 }
 
+{% if cert_source != 'none' %}
 server {
     listen 443;
     server_name {{ domain }};
@@ -106,3 +107,4 @@ server {
 
     {{ serve_django() }}
 }
+{% endif %}
