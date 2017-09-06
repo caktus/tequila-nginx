@@ -43,6 +43,12 @@
     creates: "{{ dhparams_file }}"
   when: env_name != 'local'
 
+- name: require a valid choice for the SSL certificate
+  assert: { that: "cert_source in ('none', 'letsencrypt', 'selfsign', 'provided')" }
+
+- name: do not allow force_ssl if the cert_source is none
+  assert: { that: "cert_source != 'none' or not force_ssl" }
+
 - name: optionally generate self-signed cert
   command: "{{ item }}"
   args:
