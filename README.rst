@@ -77,7 +77,7 @@ role:
 - ``auth_file`` **default:** ``"{{ root_dir }}/.htpasswd"``
 - ``dhparams_file`` **default:** ``"{{ ssl_dir }}/dhparams.pem"``
 - ``dhparams_numbits`` **default:** ``2048``
-- ``cert_source`` **required, values:** ``'letsencrypt'``, ``'selfsign'``, ``'provided'``
+- ``cert_source`` **required, values:** ``'none'``, ``'letsencrypt'``, ``'selfsign'``, ``'provided'``
 - ``admin_email`` **required if cert_source = letsencrypt**
 - ``ssl_cert`` **required if cert_source = provided**
 - ``ssl_key`` **required if cert_source = provided**
