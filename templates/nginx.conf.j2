@@ -64,6 +64,8 @@ upstream {{ project_name }}  {
         proxy_intercept_errors on;
         add_header P3P 'CP="Hello IE"';
         proxy_pass http://{{ project_name }};
+
+        client_max_body_size {{ client_max_body_size|default('1m') }};
     }
 {%- endmacro %}
 
