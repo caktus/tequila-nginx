@@ -70,14 +70,18 @@ upstream {{ project_name }}  {
 server {
     listen 80;
     server_name {{ domain }};
+
     access_log syslog:server=unix:/dev/log;
     error_log syslog:server=unix:/dev/log;
+
     {% if force_ssl %}
-    {# redirect all port 80 requests to SSL #}
-    return 301 https://{{ domain }}$request_uri;
-    {% else %}
-    {{ serve_django() }}
+    {# redirect all non-https requests to https #}
+    if ($http_x_forwarded_proto != 'https') {
+        return 301 https://{{ domain }}$request_uri;
+    }
     {% endif %}
+
+    {{ serve_django() }}
 }
 
 {% if cert_source != 'none' %}
