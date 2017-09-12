@@ -12,6 +12,9 @@ v 0.8.3 on Sep 12, 2017
   https.  This allows for the case where SSL is terminated at an
   external load balancer, as in AWS ELB.
 
+* Allow forcing SSL if the cert_source is 'none'.  This also allows
+  for the external load balancer case.
+
 
 v 0.8.2 on Sep 6, 2017
 ----------------------
