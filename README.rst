@@ -71,6 +71,7 @@ role:
 - ``static_dir`` **default:** ``"{{ root_dir }}/public/static"``
 - ``media_dir`` **default:** ``"{{ root_dir }}/public/media"``
 - ``nginx_conf_template`` **default:** ``"nginx.conf.j2"``
+- ``client_max_body_size`` **default:** ``1m``
 - ``ssl_dir`` **default:** ``"{{ root_dir }}/ssl"``
 - ``force_ssl`` **default:** ``true``
 - ``http_auth`` **default:** empty list
