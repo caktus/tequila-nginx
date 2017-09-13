@@ -6,7 +6,7 @@ Changes
 v 0.8.4 on Sep 13, 2017
 ----------------
 
-* Add a [client_max_body_size option](http://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size).
+* Add a `client_max_body_size option <http://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size>` option.
 
 v 0.8.3 on Sep 12, 2017
 -----------------------
