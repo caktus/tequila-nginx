@@ -6,7 +6,7 @@ upstream {{ project_name }}  {
     root {{ public_dir }};
     keepalive_timeout 5;
 
-    if ($host !~* ^({{ domain }}|www.{{ domain }})$) {
+    if ($host !~* ^({{ domain_list | join('|') }})$) {
         # Deny non-matching Host headers
         return 444;
     }
@@ -58,7 +58,7 @@ upstream {{ project_name }}  {
         proxy_set_header X-Forwarded-Protocol $scheme;
         # Here's the proper header:
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Host {{ domain }};
+        proxy_set_header Host $host;
         proxy_redirect off;
         proxy_buffering on;
         proxy_intercept_errors on;
@@ -71,7 +71,7 @@ upstream {{ project_name }}  {
 
 server {
     listen 80;
-    server_name {{ domain }};
+    server_name {{ domain_list | join(' ') }};
 
     access_log syslog:server=unix:/dev/log;
     error_log syslog:server=unix:/dev/log;
@@ -79,7 +79,7 @@ server {
     {% if force_ssl %}
     {# redirect all non-https requests to https #}
     if ($http_x_forwarded_proto != 'https') {
-        return 301 https://{{ domain }}$request_uri;
+        return 301 https://$host$request_uri;
     }
     {% endif %}
 
@@ -89,7 +89,7 @@ server {
 {% if cert_source != 'none' %}
 server {
     listen 443;
-    server_name {{ domain }};
+    server_name {{ domain_list | join(' ') }};
 
     access_log syslog:server=unix:/dev/log;
     error_log syslog:server=unix:/dev/log;

@@ -3,8 +3,16 @@ Tequila-nginx
 
 Changes
 
+v 0.8.5 on Sep 21, 2017
+-----------------------
+
+* Add a new optional variable, ``additional_domains``, which are then
+  appended to a list containing ``domain`` and then injected into the
+  nginx template to support access of the site under multiple domain
+  names.
+
 v 0.8.4 on Sep 13, 2017
-----------------
+-----------------------
 
 * Add a `client_max_body_size option <http://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size>` option.
 
