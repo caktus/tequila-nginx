@@ -66,7 +66,12 @@ role:
 
 - ``project_name`` **required**
 - ``domain`` **required**
-- ``additional_domains`` **default:** ``['www.'+domain]``
+- ``additional_domains`` **default:** empty list
+  This is used to configure additional domains that should be allowed
+  through to serve content from.
+- ``redirect_domains`` **default:** empty list
+  This is to configure subdomains to do permanent redirects back to
+  the main ``domain`` host, e.g. redirecting www to non-www.
 - ``root_dir`` **default:** ``"/var/www/{{ project_name }}"``
 - ``public_dir`` **default:** ``"{{ root_dir }}/public"``
 - ``static_dir`` **default:** ``"{{ root_dir }}/public/static"``

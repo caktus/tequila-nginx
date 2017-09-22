@@ -6,6 +6,12 @@ upstream {{ project_name }}  {
     root {{ public_dir }};
     keepalive_timeout 5;
 
+    {% if redirect_domains|default([]) %}
+    if ($host ~* ^({{ redirect_domains | default([]) | join('|') }})$) {
+        return 301 $scheme://{{ domain }}/$request_uri;
+    }
+    {% endif %}
+
     if ($host !~* ^({{ domain_list | join('|') }})$) {
         # Deny non-matching Host headers
         return 444;

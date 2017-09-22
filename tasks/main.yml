@@ -83,7 +83,7 @@
     mode: 644
     src: "{{ nginx_conf_template|default('nginx.conf.j2') }}"
   vars:
-    domain_list: "['{{ domain }}'] + {{ additional_domains|default(['www.'+domain]) }}"
+    domain_list: "['{{ domain }}'] + {{ additional_domains|default([]) }}"
   notify: reload nginx
 
 - name: start nginx
