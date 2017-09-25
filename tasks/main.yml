@@ -77,11 +77,13 @@
   when: not http_auth
 
 - name: configure nginx server for our project
-  template: >
-    dest=/etc/nginx/sites-enabled/{{ project_name }}.conf
-    owner=root
-    mode=644
-    src={{ nginx_conf_template|default('nginx.conf.j2') }}
+  template:
+    dest: /etc/nginx/sites-enabled/{{ project_name }}.conf
+    owner: root
+    mode: 644
+    src: "{{ nginx_conf_template|default('nginx.conf.j2') }}"
+  vars:
+    domain_list: "['{{ domain }}'] + {{ additional_domains|default([]) }}"
   notify: reload nginx
 
 - name: start nginx
