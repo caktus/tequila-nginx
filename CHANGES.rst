@@ -3,6 +3,16 @@ Tequila-nginx
 
 Changes
 
+v 0.8.6 on ???
+--------------
+
+* Change the certbot cron job to fire off daily, at some random time
+  of day.  It is recommended to remove any existing certbot or
+  letsencrypt cron jobs and let the deployment create one using the
+  new parameters.  See the Let's Encrypt / Certbot section of
+  README.rst for instructions.
+
+
 v 0.8.5 on Sep 22, 2017
 -----------------------
 
