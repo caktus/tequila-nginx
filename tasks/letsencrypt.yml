@@ -60,18 +60,12 @@
     force: yes
   notify: reload nginx
 
+# The certbot docs now recommend running "as frequently as you want", so we'll do daily
 - name: add letsencrypt renewal cron job
   cron:
     name: renew_certbot
     job: /usr/local/bin/certbot-auto renew --quiet --no-self-upgrade --post-hook "service nginx reload"
     cron_file: letsencrypt
     user: root
-    day: "{{ 28|random }}"
     hour: "{{ 24|random }}"
     minute: "{{ 60|random }}"
-
-- name: remove old letsencrypt cron job
-  cron:
-    name: renew_letsencrypt
-    cron_file: letsencrypt
-    state: absent

@@ -112,3 +112,47 @@ actual project might look like ::
 The ``nginx_conf_template`` variable is to allow the template that
 ships with this role to be overridden, if more complex directives need
 to be supported.
+
+
+Let's Encrypt / Certbot
+-----------------------
+
+If the ``'letsencrypt'`` option is chosen for ``cert_source``, tasks
+in this role will download and install certbot-auto, and run it using
+the ``certonly`` option.  This will put a token file up on your web
+server under the .well-known/ directory, so you will need to have a
+correctly configured and running nginx instance in order for the Let's
+Encrypt validation server to be able to read this file.  One way of
+doing this when bootstraping a clean server is to do your first deploy
+using ``cert_source: none`` and ``force_ssl: false``, then switch to
+``cert_source: letsencrypt`` (while still keeping ``force_ssl:
+false``) for a second deployment.  If this works and a certificate is
+successfully acquired, you can then safely switch to ``force_ssl:
+true`` for subsequent deployments.
+
+Finally, a cron job will be added to fire off the ``certbot-auto
+renew`` action every day.
+
+In previous versions of tequila-nginx, the certificate renewal was set
+to occur monthly.  If your server still has an older version of this
+cron job, you can create and run a playbook like this to clear it out
+::
+
+    # file: deployment/reset_certbot_cronjob.yml
+    ---
+    - hosts: web
+      become: yes
+      tasks:
+        - name: remove old certbot cron job
+          cron:
+            name: renew_certbot
+            cron_file: letsencrypt
+            state: absent
+
+If the cron job was created by an even older version of tequila-nginx,
+you may need to replace ``name: renew_certbot`` with ``name:
+renew_letsencrypt``.  This action can be performed as an ad-hoc
+Ansible command instead, if having an extra playbook is not desirable
+::
+
+    $ ansible web -i deployment/environments/staging/inventory -m cron -a "name=renew_certbot cron_file=letsencrypt state=absent"
