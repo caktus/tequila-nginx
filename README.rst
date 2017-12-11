@@ -7,6 +7,9 @@ tasks used to install and set up an nginx webserver for a Django
 deployment.  It exists primarily to support the `Caktus Django project
 template <https://github.com/caktus/django-project-template>`_.
 
+More complete documenation can be found in `caktus/tequila
+<https://github.com/caktus/tequila>`_.
+
 
 License
 -------
