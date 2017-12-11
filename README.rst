@@ -134,25 +134,12 @@ Finally, a cron job will be added to fire off the ``certbot-auto
 renew`` action every day.
 
 In previous versions of tequila-nginx, the certificate renewal was set
-to occur monthly.  If your server still has an older version of this
-cron job, you can create and run a playbook like this to clear it out
-::
+to occur monthly.  If your server has an older version of this
+cron job under the name ``renew_certbot``, Ansible will replace it
+with one with the new parameters when you deploy.
 
-    # file: deployment/reset_certbot_cronjob.yml
-    ---
-    - hosts: web
-      become: yes
-      tasks:
-        - name: remove old certbot cron job
-          cron:
-            name: renew_certbot
-            cron_file: letsencrypt
-            state: absent
+If you still have a yet older version of the cron job under the name
+``renew_letsencrypt``, you can clear it out with an ad-hoc command
+like this::
 
-If the cron job was created by an even older version of tequila-nginx,
-you may need to replace ``name: renew_certbot`` with ``name:
-renew_letsencrypt``.  This action can be performed as an ad-hoc
-Ansible command instead, if having an extra playbook is not desirable
-::
-
-    $ ansible web -i deployment/environments/staging/inventory -m cron -a "name=renew_certbot cron_file=letsencrypt state=absent"
+    $ ansible web -i deployment/environments/staging/inventory -m cron -a "name=renew_letsencrypt cron_file=letsencrypt state=absent"
