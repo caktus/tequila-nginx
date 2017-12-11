@@ -112,3 +112,34 @@ actual project might look like ::
 The ``nginx_conf_template`` variable is to allow the template that
 ships with this role to be overridden, if more complex directives need
 to be supported.
+
+
+Let's Encrypt / Certbot
+-----------------------
+
+If the ``'letsencrypt'`` option is chosen for ``cert_source``, tasks
+in this role will download and install certbot-auto, and run it using
+the ``certonly`` option.  This will put a token file up on your web
+server under the .well-known/ directory, so you will need to have a
+correctly configured and running nginx instance in order for the Let's
+Encrypt validation server to be able to read this file.  One way of
+doing this when bootstraping a clean server is to do your first deploy
+using ``cert_source: none`` and ``force_ssl: false``, then switch to
+``cert_source: letsencrypt`` (while still keeping ``force_ssl:
+false``) for a second deployment.  If this works and a certificate is
+successfully acquired, you can then safely switch to ``force_ssl:
+true`` for subsequent deployments.
+
+Finally, a cron job will be added to fire off the ``certbot-auto
+renew`` action every day.
+
+In previous versions of tequila-nginx, the certificate renewal was set
+to occur monthly.  If your server has an older version of this
+cron job under the name ``renew_certbot``, Ansible will replace it
+with one with the new parameters when you deploy.
+
+If you still have a yet older version of the cron job under the name
+``renew_letsencrypt``, you can clear it out with an ad-hoc command
+like this::
+
+    $ ansible web -i deployment/environments/staging/inventory -m cron -a "name=renew_letsencrypt cron_file=letsencrypt state=absent"
