@@ -3,8 +3,8 @@ Tequila-nginx
 
 Changes
 
-v 0.8.6 on ???
---------------
+v 0.8.6 on May 13, 2018
+-----------------------
 
 * Change the certbot cron job to fire off daily, at some random time
   of day.  Ansible will replace the parameters of the cron job each
