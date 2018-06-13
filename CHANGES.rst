@@ -3,6 +3,19 @@ Tequila-nginx
 
 Changes
 
+
+v 0.8.7 on June n, 2018
+-----------------------
+
+* Add an additional clause to the ``force_ssl`` block in ``nginx.conf.j2``.
+  An explicit check for an empty ``$http_x_forwarded_proto`` value is
+  apparently necessary to ensure that non-https requests get redirected
+  to http when not behind AWS load balancer. (See changes for v 0.8.3
+  for details on the affected code.)
+
+  Without this change, deploys with ``force_ssl`` to single-server
+  environments will fail with a Gunicorn scheme mismatch error.
+
 v 0.8.6 on May 13, 2018
 -----------------------
 
