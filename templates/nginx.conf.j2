@@ -8,7 +8,7 @@ upstream {{ project_name }}  {
 
     {% if redirect_domains|default([]) %}
     if ($host ~* ^({{ redirect_domains | default([]) | join('|') }})$) {
-        return 301 $scheme://{{ domain }}/$request_uri;
+        return 301 $scheme://{{ domain }}$request_uri;
     }
     {% endif %}
 
@@ -86,11 +86,11 @@ server {
     {# redirect all non-https requests to https #}
     {# if there's no forwarded proto value, always redirect #}
     if ($http_x_forwarded_proto = '') {
-        return 301 https://$host$request_uri;
+        return 301 https://{{ domain }}$request_uri;
     }
     {# if there is a forwarded proto value and it's not https, redirect #}
     if ($http_x_forwarded_proto != 'https') {
-        return 301 https://$host$request_uri;
+        return 301 https://{{ domain }}$request_uri;
     }
     {# otherwise, proceed #}
     {% endif %}
