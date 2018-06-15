@@ -4,7 +4,7 @@ Tequila-nginx
 Changes
 
 
-v 0.8.7 on June n, 2018
+v 0.8.7 on June 15, 2018
 -----------------------
 
 * Add an additional clause to the ``force_ssl`` block in ``nginx.conf.j2``.
@@ -13,8 +13,8 @@ v 0.8.7 on June n, 2018
   to http when not behind AWS load balancer. (See changes for v 0.8.3
   for details on the affected code.)
 
-  Without this change, deploys with ``force_ssl`` to single-server
-  environments will fail with a Gunicorn scheme mismatch error.
+  Without this change, deploys with ``force_ssl`` to single-server environments
+  may fail with a Gunicorn scheme mismatch error (in Digital Ocean).
 
 v 0.8.6 on May 13, 2018
 -----------------------
