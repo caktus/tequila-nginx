@@ -9,3 +9,4 @@ dhparams_file: "{{ ssl_dir }}/dhparams.pem"
 http_auth: []
 auth_file: "{{ root_dir }}/.htpasswd"
 use_memcached: true
+project_port: 8000

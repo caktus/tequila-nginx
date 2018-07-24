@@ -93,15 +93,14 @@
 - include: letsencrypt.yml
   when: cert_source == "letsencrypt"
 
-- name: install memcached
-  apt: name=memcached state=present
-  when: use_memcached
+- when: use_memcached and not subproject
+  block:
+  - name: install memcached
+    apt: name=memcached state=present
 
-- name: ensure memcached is running
-  service: name=memcached state=started
-  when: use_memcached
+  - name: ensure memcached is running
+    service: name=memcached state=started
 
-- name: allow the app minions through the firewall for memcached
-  ufw: rule=allow port=11211 from_ip={{ hostvars[item].ansible_default_ipv4.address }}
-  with_items: "{{ app_minions }}"
-  when: use_memcached
+  - name: allow the app minions through the firewall for memcached
+    ufw: rule=allow port=11211 from_ip={{ hostvars[item].ansible_default_ipv4.address }}
+    with_items: "{{ app_minions }}"
