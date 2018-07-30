@@ -94,6 +94,7 @@ role:
 - ``letsencrypt_domains`` **default:** ``[domain, 'www.'+domain]``
 - ``use_memcached`` **default:** ``true``
 - ``app_minions`` **required:** combined list of web servers and celery worker servers
+- ``project_port`` **default:** 8000 - what port to proxy Django requests to
 
 The ``app_minions`` variable can be constructed from Ansible's
 inventory information, like ::
