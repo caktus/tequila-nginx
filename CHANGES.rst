@@ -4,7 +4,7 @@ Tequila-nginx
 Changes
 
 
-v X.Y.Z on MMM dd, YYYY
+v 0.8.8 on Jul 30, 2018
 -----------------------
 
 * New variable ``project_port`` to say that Django is listening on a port
