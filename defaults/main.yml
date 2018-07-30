@@ -9,3 +9,5 @@ dhparams_file: "{{ ssl_dir }}/dhparams.pem"
 http_auth: []
 auth_file: "{{ root_dir }}/.htpasswd"
 use_memcached: true
+nginx_http_port: 80
+nginx_https_port: 443
