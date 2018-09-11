@@ -96,7 +96,7 @@ server {
 
 {% if cert_source != 'none' %}
 server {
-    listen {{ nginx_https_port }} ssl;
+    listen {{ nginx_https_port }};
     server_name {{ domain_list | join(' ') }};
 
     access_log syslog:server=unix:/dev/log;
