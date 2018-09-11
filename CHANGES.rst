@@ -4,6 +4,12 @@ Tequila-nginx
 Changes
 
 
+v 0.8.8 on Jul 30, 2018
+-----------------------
+
+* New variable ``project_port`` to say that Django is listening on a port
+  other than 8000, to help with multi-site deploys.
+
 v 0.8.7 on June 15, 2018
 -----------------------
 
