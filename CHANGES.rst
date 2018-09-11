@@ -4,6 +4,12 @@ Tequila-nginx
 Changes
 
 
+v 0.8.9 on Sep 11, 2018
+-----------------------
+
+* New variables ``nginx_http_port`` and ``nginx_https_port`` to
+  override the listen ports from 80 and 443.
+
 v 0.8.8 on Jul 30, 2018
 -----------------------
 
