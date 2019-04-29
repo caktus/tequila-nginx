@@ -1,15 +1,22 @@
 ---
+- name: stat certbot-auto /usr/local/bin/ script
+  stat:
+    path: /usr/local/bin/certbot-auto
+  register: file_details
+
 - name: install gnupg2
   apt:
     name: gnupg2
     state: present
     cache_valid_time: 3600
+  when: not file_details.stat.exists
 
 - name: download the certbot-auto signature file
   get_url:
     url: https://dl.eff.org/certbot-auto.asc
     dest: /tmp/certbot-auto.asc
     force: yes
+  when: not file_details.stat.exists
 
 - name: install the certbot-auto script
   get_url:
@@ -17,25 +24,28 @@
     dest: /usr/local/bin/certbot-auto
     force: yes
     mode: 755
+  when: not file_details.stat.exists
 
 - name: receive the certbot gpg key
   command: gpg2 --keyserver pgpkeys.mit.edu --recv-key A2CFB51FA275A7286234E7B24D17C995CD9775F2
+  when: not file_details.stat.exists
 
 - name: verify the certbot-auto download
   command: gpg2 --trusted-key 4D17C995CD9775F2 --verify /tmp/certbot-auto.asc /usr/local/bin/certbot-auto
   register: verify_result
   ignore_errors: true
+  when: not file_details.stat.exists
 
 - name: delete certbot-auto if it fails to verify
   file:
     path: /usr/local/bin/certbot-auto
     state: absent
-  when: verify_result|failed
+  when: not file_details.stat.exists and verify_result|failed
 
 - name: re-raise certbot-auto verification failure
   fail:
     msg: "certbot-auto does not match the gpg key."
-  when: verify_result|failed
+  when: not file_details.stat.exists and verify_result|failed
 
 - name: run certbot to get a key and certificate
   command: certbot-auto certonly --webroot -w {{ public_dir }} {{ letsencrypt_domain_args }} --email={{ admin_email }} --agree-tos --text --quiet --no-self-upgrade
