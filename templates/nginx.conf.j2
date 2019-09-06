@@ -117,6 +117,10 @@ server {
 
     {% if force_ssl %}
     add_header Strict-Transport-Security max-age=31536000;
+    {# if there is a forwarded proto value and it's set to 'http' (i.e., if we're sitting behind another load balancer that is forwarding its port 80 to our port 443), redirect #}
+    if ($http_x_forwarded_proto = 'http') {
+        return 301 https://$host$request_uri;
+    }
     {% endif %}
 
     {{ serve_django() }}
