@@ -4,6 +4,12 @@ Tequila-nginx
 Changes
 
 
+v 0.8.10 on Sep 6, 2019
+-----------------------
+
+* If nginx is behind a load balancer that sets X-Forwarded-Proto: http,
+  redirect to HTTPS even on port 443.
+
 v 0.8.9 on Sep 11, 2018
 -----------------------
 
