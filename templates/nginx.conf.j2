@@ -8,7 +8,7 @@ upstream {{ project_name }}  {
 
     {% if redirect_domains|default([]) %}
     if ($host ~* ^({{ redirect_domains | default([]) | join('|') }})$) {
-        return 301 $scheme://{{ domain }}/$request_uri;
+        return 301 $scheme://{{ domain }}$request_uri;
     }
     {% endif %}
 
