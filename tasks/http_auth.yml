@@ -15,5 +15,5 @@
     state: present
     owner: root
     group: www-data
-    mode: 640
+    mode: "640"
   with_items: "{{ http_auth }}"
