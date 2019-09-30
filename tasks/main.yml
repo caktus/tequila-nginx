@@ -70,13 +70,13 @@
     - reload nginx
 
 - include: http_auth.yml
-  when: http_auth|bool
+  when: http_auth | default([]) | length > 0
 
 - name: remove htpasswd file
   file:
     path: "{{ auth_file }}"
     state: absent
-  when: not http_auth|bool
+  when: not http_auth | default([]) | length > 0
 
 - name: configure nginx server for our project
   template:
