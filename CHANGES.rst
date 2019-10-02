@@ -3,8 +3,8 @@ Tequila-nginx
 
 Changes
 
-v 0.8.12 on Sep 30, 2019
-------------------------
+v 0.8.12 on Oct 2, 2019
+-----------------------
 
 * Fix deprecation warnings with ``httpauth`` tasks
 
