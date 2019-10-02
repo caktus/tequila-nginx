@@ -3,6 +3,17 @@ Tequila-nginx
 
 Changes
 
+v 0.8.12 on Sep 30, 2019
+------------------------
+
+* Fix deprecation warnings with ``httpauth`` tasks
+
+
+v 0.8.11 on Sep 26, 2019
+------------------------
+
+* Don't add an extra slash when redirecting to a domain in ``redirect_domains``
+
 
 v 0.8.10 on Sep 6, 2019
 -----------------------
